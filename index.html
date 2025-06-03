@@ -45,52 +45,82 @@
 
     <script>
       let modalTimer;
-      
+
       function copyKaspi(event) {
         event.preventDefault();
         
-        navigator.clipboard.writeText('4444823203303848').then(function() {
-          showModal();
-        }).catch(function(err) {
-          const textArea = document.createElement('textarea');
-          textArea.value = 'кчааау';
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-          showModal();
-        });
+        const cardNumber = '4444823203303848';
+        
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(cardNumber).then(function() {
+            showModal();
+          }).catch(function(err) {
+            console.warn('Clipboard API failed, falling back to execCommand:', err);
+            fallbackCopy(cardNumber);
+          });
+        } else {
+          fallbackCopy(cardNumber);
+        }
       }
-      
+
+      function fallbackCopy(text) {
+        try {
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          
+          if (successful) {
+            showModal();
+          } else {
+            console.error('Failed to copy text');
+          }
+        } catch (err) {
+          console.error('Fallback copy failed:', err);
+        }
+      }
+
       function showModal() {
         const modal = document.getElementById('kaspiModal');
-        modal.style.display = 'block';
-        
-        if (modalTimer) {
-          clearTimeout(modalTimer);
+        if (modal) {
+          modal.style.display = 'block';
+          
+          if (modalTimer) {
+            clearTimeout(modalTimer);
+          }
+          
+          modalTimer = setTimeout(function() {
+            closeModal();
+          }, 1750);
         }
-        
-        modalTimer = setTimeout(function() {
-          closeModal();
-        }, 1750);
       }
-      
+
       function closeModal() {
-        document.getElementById('kaspiModal').style.display = 'none';
+        const modal = document.getElementById('kaspiModal');
+        if (modal) {
+          modal.style.display = 'none';
+        }
         
         if (modalTimer) {
           clearTimeout(modalTimer);
           modalTimer = null;
         }
       }
-      
+
       window.onclick = function(event) {
         const modal = document.getElementById('kaspiModal');
-        if (event.target === modal) {
+        if (modal && event.target === modal) {
           closeModal();
         }
       }
-      
+
       document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
           closeModal();
