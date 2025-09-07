@@ -274,6 +274,12 @@
 	background-image:linear-gradient(-135deg,#1400c899,#b900b499,#f5000099);
 }
 
+/* donationalerts */
+.button-donationalerts {
+	--button-text: #F57D07;
+	--button-background: #1F1F1F;
+}
+
 /* Kaspi */
 .button-kaspi {
 	--button-text:#000;
